@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: local
+# Propiedades de Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: env
+
+management.endpoints.web.exposure.include: "*"
+
+logging:
+  level:
+    root: INFO
+    com.example.demo: DEBUG
+

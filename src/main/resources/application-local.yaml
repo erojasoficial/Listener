@@ -1,0 +1,55 @@
+server:
+  port: 8080
+  tomcat:
+    max-connections: 20
+    accept-count: 10
+    threads:
+      max: 20
+spring:
+  batch:
+    initialize-schema: always
+    job:
+      enabled: false
+  datasource:
+    url: jdbc:sqlserver://;serverName=tcp://0.tcp.sa.ngrok.io;port=19416;databaseName=master
+    username: sa
+    password: H3ll0W0rld!
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    databasePlatform: org.hibernate.dialect.SQLServer2012Dialect
+    showSql: true
+    hibernate:
+      ddl-auto: none
+  output:
+    ansi:
+      enabled: ALWAYS
+    main:
+      banner-mode: log
+      allow-bean-definition-overriding: true
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: https://passport-oauth-ist.apps.cloud.bns/oauth2/v1/token
+          opaquetoken:
+            introspection-uri: https://passport-oauth-ist.apps.cloud.bns/oauth2/v1/tokeninfo
+            client-id: client
+            client-secret: secret
+
+app:
+  apiUrl: https://jsonplaceholder.typicode.com/posts
+  encryptor:
+    keystore-path: /Users/enrique/Downloads/encrypt/encrypt.jceks
+    props:
+      k: "0006E7F0F07289CBB94329BB910A2E193424B02E97D8004D5A068FDB32DEF1B8"
+      iv: "84F76C994D57C0E4FB358ACB6A03FDED"
+    params:
+      p: "KOn9uJ4Zs0IkjnsFWmu7/Kl2BeGUgccGAG4dbHCWe5In6aeUoYtVO6iXu8ve1EC4Te7C"
+      kp: "Hrsz9GY53o9eT+CXQuAk4n+a1ds4verwbzGAqaavsK/OP9wRIiJAqhELEaTxZ9loUk8="
+      path: "OCj9jD7dvdWD3WI5LK39CNX62Uv/Ph3jMXVe5PRXtR4T17h9g356rz1g/w=="
+      k: "/0ku3mid2fi/x6K83xNLWBvnEHHpPAS76pLgzbMqsikHVNEq3g=="
+    task:
+      passport-handler-task:
+        enable: true
+        interval-sec: 30
+        prevention-time-sec: 5
