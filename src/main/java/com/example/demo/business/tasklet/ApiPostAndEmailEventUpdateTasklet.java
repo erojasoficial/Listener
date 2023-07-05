@@ -1,6 +1,9 @@
-package com.example.demo.business.impl;
+package com.example.demo.business.tasklet;
 
+import java.util.Optional;
+;
 import com.example.demo.business.CryptoService;
+import com.example.demo.business.impl.ApiServiceImpl;
 import com.example.demo.constants.Constants;
 import com.example.demo.domain.dto.SendMailRequest;
 import com.example.demo.domain.model.EncryptedValue;
@@ -9,6 +12,7 @@ import com.example.demo.exceptions.JsonProcessingRuntimeException;
 import com.example.demo.repository.impl.EmailEventRepositoryImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -21,10 +25,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
-import java.util.Optional;
-
 @Component
-public class StepApiPostAndEmailEventUpdate implements Tasklet {
+public class ApiPostAndEmailEventUpdateTasklet implements Tasklet {
     @Value("${app.apiUrl}")
     private String apiUrl;
     private final CryptoService cryptoService;
@@ -33,7 +35,7 @@ public class StepApiPostAndEmailEventUpdate implements Tasklet {
     private final EmailEventRepositoryImpl emailEventRepository;
 
     @Autowired
-    public StepApiPostAndEmailEventUpdate(ObjectMapper objectMapper, ApiServiceImpl apiService, EmailEventRepositoryImpl emailEventRepository, CryptoService cryptoService) {
+    public ApiPostAndEmailEventUpdateTasklet(ObjectMapper objectMapper, ApiServiceImpl apiService, EmailEventRepositoryImpl emailEventRepository, CryptoService cryptoService) {
         this.objectMapper = objectMapper;
         this.apiService = apiService;
         this.emailEventRepository = emailEventRepository;

@@ -4,10 +4,7 @@ import com.example.demo.business.ApiService;
 import com.example.demo.exceptions.HttpCallRuntimeException;
 import com.example.demo.exceptions.NetworkRuntimeException;
 import com.example.demo.util.MailListenerUtil;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -29,7 +26,7 @@ public class ApiServiceImpl implements ApiService {
                                             String xOriginatingApplCode, String xCountryCode) {
         HttpHeaders headers = mailListenerUtil.getHeaders(
                 xB3Traceid, xB3Spanid, xChannelId, xOriginatingApplCode, xCountryCode);
-
+        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
         try {
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);

@@ -1,6 +1,5 @@
 package com.example.demo.business;
 
-import com.example.demo.business.impl.MyJobLauncher;
 import com.example.demo.exceptions.ScheduleServiceException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

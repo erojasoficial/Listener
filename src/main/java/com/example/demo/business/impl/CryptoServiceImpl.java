@@ -37,5 +37,4 @@ public class CryptoServiceImpl implements CryptoService {
             throw new EncryptionException(MessageErrorHelper.DECRYPTION_MESSAGE, e);
         }
     }
-
 }

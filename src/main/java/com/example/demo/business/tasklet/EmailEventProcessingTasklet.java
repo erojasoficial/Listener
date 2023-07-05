@@ -1,4 +1,6 @@
-package com.example.demo.business.impl;
+package com.example.demo.business.tasklet;
+
+import java.util.Optional;
 
 import com.example.demo.constants.Constants;
 import com.example.demo.converter.StringPositionToCustomDtoConverter;
@@ -8,8 +10,8 @@ import com.example.demo.domain.entity.MessageEntity;
 import com.example.demo.domain.model.StringPosition;
 import com.example.demo.exceptions.MessageNotFoundException;
 import com.example.demo.exceptions.MessageProcessingRuntimeException;
-import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.impl.EmailEventRepositoryImpl;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -18,49 +20,41 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component
-public class StepEmailEventProcessing implements Tasklet {
+public class EmailEventProcessingTasklet implements Tasklet {
     private final StringToStringPositionConverter stringConverter;
     private final StringPositionToCustomDtoConverter dtoConverter;
     private final EmailEventRepositoryImpl emailEventRepository;
-    private final MessageRepository messageRepository;
 
     @Autowired
-    public StepEmailEventProcessing(StringToStringPositionConverter stringConverter, StringPositionToCustomDtoConverter dtoConverter,
-                                    EmailEventRepositoryImpl emailEventRepository, MessageRepository messageRepository) {
+    public EmailEventProcessingTasklet(StringToStringPositionConverter stringConverter, StringPositionToCustomDtoConverter dtoConverter,
+                                       EmailEventRepositoryImpl emailEventRepository) {
         this.stringConverter = stringConverter;
         this.dtoConverter = dtoConverter;
         this.emailEventRepository = emailEventRepository;
-        this.messageRepository = messageRepository;
     }
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        Optional<Long> messageId = Optional.ofNullable((Long) chunkContext.getStepContext().getJobParameters().get("messageId"));
+        String message = (String) chunkContext.getStepContext().getJobParameters().get("message");
         Integer insertedId = null;
 
-        try {
-            if (messageId.isPresent()) {
-                MessageEntity messageEntity = messageRepository.findById(messageId.get()).orElseThrow(() ->
-                        new MessageNotFoundException("Message not found for the ID: " + messageId.get()));
-                String message = messageEntity.getMessage();
+        if (message != null) {
+            try {
                 StringPosition[] positions = stringConverter.convert(message);
                 SendMailRequest customDto = dtoConverter.convert(positions);
 
                 insertedId = emailEventRepository.insertEmailEvent("dataQueueName", message);
                 updateExecutionContext(chunkContext, insertedId, message, customDto);
-            } else {
-                throw new MessageNotFoundException("No message ID provided.");
+            } catch (Exception e) {
+                handleException(insertedId, e);
+                throw new MessageProcessingRuntimeException("Error processing the message.", e);
             }
-        } catch (Exception e) {
-            handleException(insertedId, e);
-            throw new MessageProcessingRuntimeException("Error processing the message.", e);
         }
 
         return RepeatStatus.FINISHED;
     }
+
     private void updateExecutionContext(ChunkContext chunkContext, Integer insertedId, String message, SendMailRequest customDto) {
         ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
         executionContext.put(Constants.INSERTED_ID, insertedId);
