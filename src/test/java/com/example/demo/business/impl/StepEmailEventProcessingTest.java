@@ -87,7 +87,7 @@ public class StepEmailEventProcessingTest {
         when(stepContext.getJobParameters()).thenReturn(Map.of());
 
         // Act and Assert
-        assertThrows(MessageNotFoundException.class, () -> {
+        assertThrows(MessageProcessingRuntimeException.class, () -> {
             emailEventProcessingStep.execute(contribution, chunkContext);
         });
     }
@@ -101,7 +101,7 @@ public class StepEmailEventProcessingTest {
         when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
 
         // Act and Assert
-        assertThrows(MessageNotFoundException.class, () -> {
+        assertThrows(MessageProcessingRuntimeException.class, () -> {
             emailEventProcessingStep.execute(contribution, chunkContext);
         });
     }
